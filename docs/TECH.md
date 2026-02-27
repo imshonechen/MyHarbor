@@ -35,7 +35,7 @@
 1. 前端请求 API。
 2. FastAPI 路由完成参数校验与权限判断。
 3. 业务逻辑在 service 执行并读写数据库。
-4. 返回统一 JSON 响应结构。
+4. 成功时返回统一 JSON 响应结构；错误时返回 FastAPI 默认异常响应（`detail`）。
 5. 前端根据响应更新界面状态。
 
 ## 3. 项目目录
@@ -92,7 +92,7 @@ MyHarbor/
 │   │   │   ├── SiteFormDrawer.vue   # 站点表单抽屉
 │   │   │   └── ConfirmDialog.vue    # 确认对话框
 │   │   ├── api/                 # API 请求封装
-│   │   │   ├── client.js        # Axios 客户端
+│   │   │   ├── client.js        # API 客户端封装（fetch）
 │   │   │   ├── auth.js
 │   │   │   ├── sites.js
 │   │   │   ├── stats.js
@@ -109,17 +109,10 @@ MyHarbor/
 ├── docker-compose.yml
 ├── Dockerfile
 └── docs/
-    ├── PRD.md
-    ├── TECH.md
-    ├── API_CONTRACT.md
-    ├── CODING_RULES.md
-    ├── ENV.md
-    ├── I18N.md
-    ├── DB_MIGRATIONS.md
-    ├── TEST_CASES.md
-    ├── TASKS.md
-    ├── ROADMAP.md
-    └── RUNBOOK.md
+    ├── README.md                # 文档导航（先读这个）
+    ├── PRD.md                   # 产品需求文档（含路线图/任务/测试用例）
+    ├── TECH.md                  # 技术设计文档（含环境变量/开发规范等）
+    └── API_CONTRACT.md          # API 契约文档（联调基线）
 ```
 
 ## 4. 数据库设计
@@ -217,7 +210,7 @@ MyHarbor/
 
 ### 5.1 配置管理（`config.py`）
 
-通过环境变量覆盖默认配置（详见 `docs/ENV.md`）：
+通过环境变量覆盖默认配置（见本文附录「环境变量」或 `backend/app/config.py`）：
 
 - `APP_NAME`（默认 `MyHarbor API`）
 - `APP_HOST`（默认 `0.0.0.0`）
@@ -396,15 +389,15 @@ const { t, locale } = useI18n()
 - `statistics.*`：访问统计
 - `monitoring.*`：站点监控
 
-详细文档参见：`docs/I18N.md`
+详细说明见本文附录「多语言（i18n）」。
 
 ## 7. 非功能实现
 
 ### 7.1 性能
 
-- SQLite 开启 WAL 模式提升并发读写
-- 检测任务异步并发（设置合理并发上限，如 10）
-- 列表查询分页（预留能力，初版可不开放分页参数）
+- 建议 SQLite 开启 WAL 模式提升并发读写（见 `DEPLOYMENT.md` 的排查章节）。
+- 站点检测当前为串行执行；如需加速可在 `check_all_sites` 引入并发与限流。
+- 列表查询支持分页（`GET /api/sites` 的 `page/size` 参数）。
 
 ### 7.2 可观测性
 
@@ -496,7 +489,9 @@ const { t, locale } = useI18n()
 3. M3：状态检测 + 定时任务 + 30 天图例
 4. M4：访问统计 + 备份恢复 + CLI + Docker 交付
 
-## 13. 接口详细定义
+## 13. 接口详细定义（已迁移）
+
+> 接口字段级定义、联调示例与规则以 `docs/API_CONTRACT.md` 为准；本章可视为历史记录，后续可删除。
 
 ### 13.1 通用协议
 
@@ -1078,3 +1073,389 @@ Query 参数：
 - `sort_order` 数值越小越靠前
 - 删除站点后，关联日志与统计必须同步删除
 - 修改 `admin_route_code` 后，旧路径应立即失效
+
+---
+
+## 附录
+
+> 为减少文档数量，原 `docs/ENV.md`、`docs/CODING_RULES.md`、`docs/I18N.md`、`docs/DB_MIGRATIONS.md` 的内容合并至本附录。
+
+### 环境变量
+
+> 环境变量真源为 `backend/app/config.py` 的 `Settings`。
+
+#### 使用说明
+
+- 后端配置由 `backend/app/config.py` 的 `Settings` 管理，可通过环境变量覆盖默认值。
+- 本地开发（在 `backend/` 目录运行 uvicorn）时，可在 `backend/.env` 放置配置；生产/Docker 部署建议在容器编排层注入环境变量。
+- 未配置时使用默认值（见下表）。
+- 注意：站点检测**间隔**不是环境变量，属于系统配置 `check_interval`（分钟），可在管理后台“系统设置”里修改（对应接口 `PUT /api/config`）。
+
+#### 环境变量清单
+
+##### 后端环境变量
+
+| 变量名 | 默认值 | 必填 | 说明 |
+|------|------|------|------|
+| `APP_NAME` | `MyHarbor API` | 否 | FastAPI 应用标题 |
+| `APP_HOST` | `0.0.0.0` | 否 | 服务监听地址 |
+| `APP_PORT` | `24041` | 否 | 后端服务端口 |
+| `LOG_LEVEL` | `INFO` | 否 | 日志级别 |
+| `DATABASE_URL` | `sqlite:///./data/myharbor.db` | 否 | 数据库连接串 |
+| `JWT_SECRET` | `myharbor-dev-secret-change-me` | 是（生产） | JWT 签名密钥（生产必须更换强随机值） |
+| `JWT_EXPIRE_HOURS` | `24` | 否 | Token 有效期（小时） |
+| `CHECK_TIMEOUT_SECONDS` | `5` | 否 | 状态检测超时时间（秒） |
+| `ENABLE_SCHEDULER` | `true` | 否 | 是否启用内置调度器（检测/聚合/清理） |
+
+##### 前端环境变量
+
+| 变量名 | 默认值 | 必填 | 说明 |
+|------|------|------|------|
+| `VITE_API_PROXY_TARGET` | `http://127.0.0.1:24041` | 否 | 开发环境 API 代理目标地址 |
+
+> 注：前端开发服务器默认运行在端口 `24043`，可在 `frontend/vite.config.js` 中修改。
+
+#### 推荐配置
+
+##### 本地开发（`backend/.env`）
+
+```env
+APP_HOST=0.0.0.0
+APP_PORT=24041
+LOG_LEVEL=DEBUG
+DATABASE_URL=sqlite:///./data/myharbor.dev.db
+JWT_SECRET=dev-only-secret-change-me
+JWT_EXPIRE_HOURS=24
+CHECK_TIMEOUT_SECONDS=5
+ENABLE_SCHEDULER=true
+```
+
+前端开发环境（`frontend/.env.development`）：
+
+```env
+VITE_API_PROXY_TARGET=http://127.0.0.1:24041
+```
+
+##### 生产环境（Docker Compose 提示）
+
+生产环境最重要的是设置强 `JWT_SECRET`，并确保数据目录持久化（如 `./data:/app/data`）。
+
+#### 安全要求
+
+- 生产环境必须设置强随机 `JWT_SECRET`（至少 32 字符）。
+- `.env`、`backend/.env` 等本地配置文件不应提交到仓库（见 `.gitignore`）。
+- 敏感配置建议通过 CI/CD Secret 或容器编排平台注入。
+
+#### 校验建议
+
+- 服务启动时打印关键配置摘要（脱敏后）。
+- 对关键变量做启动校验（例如 `JWT_SECRET` 长度）。
+
+#### 端口配置快速参考
+
+##### 默认端口
+
+- **后端服务**：`24041`
+- **前端开发服务器**：`24043`
+
+##### 修改端口
+
+**方式一：通过环境变量（推荐）**
+
+后端：
+```bash
+export APP_PORT=8080
+# 或在 .env 文件中
+APP_PORT=8080
+```
+
+前端：
+```bash
+export VITE_API_PROXY_TARGET=http://127.0.0.1:8080
+# 或在 frontend/.env.development 中
+VITE_API_PROXY_TARGET=http://127.0.0.1:8080
+```
+
+**方式二：修改配置文件**
+
+- 后端：修改 `backend/app/config.py` 中的 `app_port` 默认值
+- 前端：修改 `frontend/vite.config.js` 中的 `port` 和 `proxyTarget` 默认值
+
+##### Docker 部署端口映射
+
+在 `docker-compose.yml` 中修改端口映射：
+
+```yaml
+ports:
+  - "24041:24041"  # 格式：宿主机端口:容器端口
+```
+
+如果修改了容器内端口（通过 `APP_PORT` 环境变量），需要同步修改映射：
+
+```yaml
+environment:
+  - APP_PORT=8080
+ports:
+  - "24041:8080"  # 宿主机仍用 24041，容器内用 8080
+```
+
+### 开发规范
+
+#### 目标
+
+- 统一代码风格与目录结构。
+- 降低协作成本，提升可维护性与可测试性。
+
+#### 通用规范
+
+- 变更必须附带明确目的，不提交无关改动。
+- 业务逻辑优先放在 service 层，router 仅做校验和编排。
+- 新增功能必须同时补充文档与测试。
+- 禁止硬编码敏感信息（密码、密钥、Token）。
+
+#### 后端规范（Python + FastAPI）
+
+##### 目录职责
+
+- `routers/`：参数校验、鉴权、调用 service、返回响应。
+- `services/`：核心业务逻辑、事务边界。
+- `models.py`：ORM 模型定义。
+- `schemas.py`：Pydantic 请求/响应模型。
+- `utils/`：通用工具，不依赖具体业务。
+
+##### 编码要求
+
+- 使用类型注解。
+- 所有外部请求必须设置超时。
+- 接口返回统一响应结构（成功场景）。
+- 错误处理建议使用统一异常映射，不直接向前端暴露堆栈。
+
+##### 命名规则
+
+- 文件与函数：`snake_case`
+- 类名：`PascalCase`
+- 常量：`UPPER_SNAKE_CASE`
+
+#### 前端规范（Vue 3）
+
+- 页面放 `views/`，可复用组件放 `components/`。
+- API 请求统一从 `api/` 发起，不在组件中直写 URL。
+- 状态管理统一使用 store，避免跨组件隐式依赖。
+- 组件 Props 和事件命名应语义化。
+
+#### API 变更规范
+
+- 改动接口时同步更新：
+  - `docs/API_CONTRACT.md`
+  - `docs/TECH.md`（如涉及架构/字段变更）
+- 破坏性变更需在 PR 标注：
+  - 影响范围
+  - 升级步骤
+  - 回滚方案
+
+#### 数据库变更规范
+
+- 禁止直接在线手改表结构。
+- 所有表结构变更必须通过迁移脚本。
+- 迁移脚本必须具备回滚能力。
+
+#### Git 与提交规范
+
+##### 分支命名
+
+- `feature/<name>`
+- `fix/<name>`
+- `chore/<name>`
+- `docs/<name>`
+
+##### 提交信息
+
+建议格式：
+
+```text
+类型(范围): 简要说明
+```
+
+推荐类型：
+
+- `新功能`：新增功能
+- `修复`：缺陷修复
+- `文档`：文档更新
+- `重构`：代码重构（不改行为）
+- `测试`：测试相关
+- `构建`：构建、依赖、脚本变更
+
+示例：
+
+```text
+新功能(接口): 新增站点批量检测接口
+修复(鉴权): 修复登录限流锁定时间判断错误
+文档(技术文档): 补充 API 字段级契约说明
+```
+
+#### Code Review 检查项
+
+1. 是否满足需求与 DoD。
+2. 是否引入行为回归或安全风险。
+3. 是否补充必要测试与文档。
+4. 是否存在明显性能或并发问题。
+5. 是否保证可读性与可维护性。
+
+### 多语言（i18n）
+
+#### 概述
+
+MyHarbor 支持多语言功能，默认语言为**中文（简体）**，同时支持**英文**。用户可以在管理后台自由切换语言。
+
+#### 已实现的功能
+
+##### 多语言配置
+
+- **默认语言**：中文（zh-CN）
+- **支持语言**：中文、英文
+- **语言持久化**：用户选择的语言会保存在浏览器的 localStorage 中，下次访问时自动应用
+
+##### 语言文件位置
+
+```text
+frontend/src/locales/
+├── index.js      # i18n 配置文件
+├── zh-CN.js      # 中文翻译
+└── en.js         # 英文翻译
+```
+
+#### 使用方法
+
+##### 用户端使用
+
+1. 访问前台首页：默认显示中文界面。
+2. 登录管理后台。
+3. 在左侧边栏底部切换语言（中文/EN），切换后立即生效并持久化。
+
+##### 开发者使用
+
+在组件中使用 i18n：
+
+```vue
+<script setup>
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+</script>
+
+<template>
+  <div>
+    <h1>{{ t('dashboard.title') }}</h1>
+  </div>
+</template>
+```
+
+添加新的翻译：
+
+1. 在 `frontend/src/locales/zh-CN.js` 中添加中文翻译。
+2. 在 `frontend/src/locales/en.js` 中添加英文翻译。
+3. 在组件中使用对应 key。
+
+#### 翻译键结构
+
+```text
+common          - 通用文本（按钮、状态等）
+home            - 首页
+login           - 登录页
+layout          - 后台布局
+dashboard       - 仪表盘
+sites           - 站点管理
+siteForm        - 站点表单
+settings        - 系统设置
+statistics      - 访问统计
+monitoring      - 站点监控
+```
+
+#### 注意事项
+
+- 语言切换入口在管理后台；前台首页暂不提供切换（如需可扩展）。
+- 用户输入数据（站点名称、描述等）不做翻译。
+- 不同语言下文本长度不同，注意布局适配。
+
+#### 扩展语言（示例）
+
+如需添加更多语言（如日语）：
+
+1. 创建新的语言文件：`frontend/src/locales/ja.js`
+2. 在 `frontend/src/locales/index.js` 中导入并注册
+3. 在语言切换器中增加入口
+
+#### 测试建议
+
+1. 切换语言后检查各页面文本是否正确显示。
+2. 刷新页面后语言选择是否保持。
+3. 不同语言下的布局是否正常。
+
+### 数据库迁移规范（可选）
+
+> 当前仓库尚未集成 Alembic，本节仅提供建议流程。
+
+#### 目标
+
+- 保证数据库结构演进可追踪、可回滚、可复现。
+- 避免手工改库导致环境不一致。
+
+#### 工具与目录（建议）
+
+- ORM：SQLAlchemy
+- 迁移工具：Alembic（建议）
+- 目录建议：
+  - `backend/alembic.ini`
+  - `backend/alembic/env.py`
+  - `backend/alembic/versions/*.py`
+
+#### 迁移命名规则
+
+- 文件名：`<timestamp>_<short_desc>.py`
+- 示例：`20260216_103000_add_visit_stats_index.py`
+- 描述要求：动词开头，明确变更对象。
+
+#### 变更流程（建议）
+
+1. 修改 `models.py`。
+2. 生成迁移草稿：`alembic revision --autogenerate -m "add_xxx"`。
+3. 人工审查脚本，确认字段/索引/约束正确。
+4. 执行迁移：`alembic upgrade head`。
+5. 回归验证后合并。
+
+#### 回滚流程（建议）
+
+- 回滚一步：`alembic downgrade -1`
+- 回滚到版本：`alembic downgrade <revision_id>`
+- 回滚前务必先做数据备份（尤其生产环境）。
+
+#### 迁移脚本要求
+
+- 必须包含 `upgrade()` 与 `downgrade()`。
+- 禁止在迁移里写业务逻辑。
+- 数据修复语句需具备幂等性。
+- 涉及大表变更时应分批或离峰执行。
+
+#### SQLite 特殊注意事项
+
+- SQLite 对 `ALTER TABLE` 支持有限。
+- 大变更策略：建新表 → 搬运数据 → 替换旧表。
+- 迁移期间需评估锁影响。
+
+#### 发布检查清单
+
+- 本次 PR 是否包含迁移脚本。
+- 脚本是否可在空库和已有数据库执行。
+- 升级与回滚是否都验证通过。
+- 与数据模型说明是否一致。
+
+#### 示例迁移评审模板
+
+```md
+### Migration Review
+- 变更点：
+- 风险点：
+- 是否涉及数据回填：
+- 回滚方案：
+- 验证结果：
+```
