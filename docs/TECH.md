@@ -42,6 +42,8 @@
 
 ```text
 MyHarbor/
+├── data/                    # 数据目录（SQLite：默认 `data/myharbor.db`；运行时生成，不提交仓库）
+│   └── myharbor.db
 ├── backend/
 │   ├── app/
 │   │   ├── main.py              # FastAPI 入口
@@ -109,10 +111,10 @@ MyHarbor/
 ├── docker-compose.yml
 ├── Dockerfile
 └── docs/
-    ├── README.md                # 文档导航（先读这个）
     ├── PRD.md                   # 产品需求文档（含路线图/任务/测试用例）
-    ├── TECH.md                  # 技术设计文档（含环境变量/开发规范等）
-    └── API_CONTRACT.md          # API 契约文档（联调基线）
+    ├── TECH.md                  # 技术设计文档（含环境变量/开发规范/i18n/迁移规范等）
+    ├── API_CONTRACT.md          # API 契约文档（联调基线）
+    └── RUNBOOK.md               # 运维手册（部署、升级、备份、故障排查）
 ```
 
 ## 4. 数据库设计
@@ -216,7 +218,7 @@ MyHarbor/
 - `APP_HOST`（默认 `0.0.0.0`）
 - `APP_PORT`（默认 `24041`）
 - `LOG_LEVEL`（默认 `INFO`）
-- `DATABASE_URL`（默认 `sqlite:///./data/myharbor.db`）
+- `DATABASE_URL`（默认：项目根目录 `data/myharbor.db`）
 - `JWT_SECRET`（生产必须设置）
 - `JWT_EXPIRE_HOURS`（默认 `24`）
 - `CHECK_TIMEOUT_SECONDS`（默认 `5`）
@@ -516,7 +518,7 @@ const { t, locale } = useI18n()
 | `APP_HOST` | `0.0.0.0` | 否 | 服务监听地址 |
 | `APP_PORT` | `24041` | 否 | 后端服务端口 |
 | `LOG_LEVEL` | `INFO` | 否 | 日志级别 |
-| `DATABASE_URL` | `sqlite:///./data/myharbor.db` | 否 | 数据库连接串 |
+| `DATABASE_URL` | 项目根目录 `data/myharbor.db` | 否 | 数据库连接串（默认指向项目根目录 `data/myharbor.db`） |
 | `JWT_SECRET` | `myharbor-dev-secret-change-me` | 是（生产） | JWT 签名密钥（生产必须更换强随机值） |
 | `JWT_EXPIRE_HOURS` | `24` | 否 | Token 有效期（小时） |
 | `CHECK_TIMEOUT_SECONDS` | `5` | 否 | 状态检测超时时间（秒） |
@@ -538,7 +540,8 @@ const { t, locale } = useI18n()
 APP_HOST=0.0.0.0
 APP_PORT=24041
 LOG_LEVEL=DEBUG
-DATABASE_URL=sqlite:///./data/myharbor.dev.db
+# 可选：使用独立开发库（不配置则默认使用项目根目录 `data/myharbor.db`）
+DATABASE_URL=sqlite:///../data/myharbor.dev.db
 JWT_SECRET=dev-only-secret-change-me
 JWT_EXPIRE_HOURS=24
 CHECK_TIMEOUT_SECONDS=5

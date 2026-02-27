@@ -264,6 +264,8 @@ MyHarbor 是一个个人站点导航页面，用于集中管理和快速访问�
 
 ```
 MyHarbor/
+├── data/                    # 数据目录（SQLite：默认 `data/myharbor.db`；运行时生成，不提交仓库）
+│   └── myharbor.db
 ├── backend/
 │   ├── app/
 │   │   ├── main.py              # FastAPI 入口
@@ -331,10 +333,10 @@ MyHarbor/
 ├── docker-compose.yml
 ├── Dockerfile
 ├── docs/
-│   ├── README.md                # 文档导航（先读这个）
 │   ├── PRD.md                   # 产品需求文档（含路线图/任务/测试用例）
-│   ├── TECH.md                  # 技术设计文档（含环境变量/开发规范等）
-│   └── API_CONTRACT.md          # API 契约文档（联调基线）
+│   ├── TECH.md                  # 技术设计文档（含环境变量/开发规范/i18n/迁移规范等）
+│   ├── API_CONTRACT.md          # API 契约文档（联调基线）
+│   └── RUNBOOK.md               # 运维手册（部署、升级、备份、故障排查）
 └── README.MD
 ```
 

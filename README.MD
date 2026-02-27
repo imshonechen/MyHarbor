@@ -119,8 +119,9 @@ npm run dev
 # 应用端口
 APP_PORT=24041
 
-# 数据库路径
-DATABASE_URL=sqlite:///./data/myharbor.db
+# 数据库路径（可选；默认：项目根目录 `data/myharbor.db`）
+# Windows 示例：DATABASE_URL=sqlite:///C:/path/to/data/myharbor.db
+# Linux/macOS 示例：DATABASE_URL=sqlite:////path/to/data/myharbor.db
 
 # JWT 密钥
 JWT_SECRET=your-secret-key
