@@ -164,14 +164,3 @@ python backend/manage.py show-route
 # 设置管理员账号
 python backend/manage.py set-admin --username admin --password newpass
 ```
-
-
-## 📝 开发计划
-
-- [x] 基础框架搭建
-- [x] 站点管理功能
-- [x] 状态检测功能
-- [x] 访问统计功能
-- [x] 多语言支持
-- [ ] 数据可视化增强
-- [ ] 更多主题支持
