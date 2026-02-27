@@ -14,6 +14,11 @@ export default defineConfig(({ mode }) => {
         "/api": {
           target: proxyTarget,
           changeOrigin: true
+        },
+        // 将 /{安全路由码} 转发到后端，便于本地开发时通过前端端口访问后台入口
+        "^/[A-Za-z0-9]{6,32}$": {
+          target: proxyTarget,
+          changeOrigin: true
         }
       }
     }
