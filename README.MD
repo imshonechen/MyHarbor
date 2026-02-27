@@ -22,7 +22,7 @@ MyHarbor 支持多语言界面，默认语言为**中文**：
 - 🎯 语言切换：登录管理后台后，在侧边栏底部可切换语言
 - 💾 语言持久化：用户选择的语言会自动保存
 
-详细说明请查看：[多语言使用文档](docs/I18N.md)
+详细说明请查看：[技术文档（多语言 i18n）](docs/TECH.md#多语言i18n)
 
 ## 🚀 技术栈
 
@@ -74,12 +74,10 @@ npm run dev
 ## 📖 文档
 
 - [文档导航（推荐先读）](docs/README.md)
-- [产品需求文档](docs/PRD.md)
-- [技术设计文档](docs/TECH.md)
+- [产品需求文档（含路线图/任务/测试用例）](docs/PRD.md)
+- [技术设计文档（含环境变量/开发规范/i18n/迁移规范）](docs/TECH.md)
 - [API 契约文档](docs/API_CONTRACT.md)
-- [开发规范](docs/CODING_RULES.md)
-- [多语言使用文档](docs/I18N.md)
-- [任务拆解清单](docs/TASKS.md)
+- [生产部署指南](DEPLOYMENT.md)
 
 ## 🎯 功能概览
 
@@ -124,7 +122,7 @@ CHECK_TIMEOUT_SECONDS=5
 LOG_LEVEL=INFO
 ```
 
-更多环境变量说明请查看：[环境变量文档](docs/ENV.md)。
+更多环境变量说明请查看：[技术文档（环境变量）](docs/TECH.md#环境变量)。
 
 > 站点检测“间隔（分钟）”属于系统配置 `check_interval`（默认 5），可在管理后台「系统设置」里修改。
 

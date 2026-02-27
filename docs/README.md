@@ -12,27 +12,20 @@
 
 ### 我是前后端开发
 
-- 开发规范：`docs/CODING_RULES.md`
-- 技术设计（架构/模块/数据库/实现细节）：`docs/TECH.md`
-- 环境变量与本地开发配置：`docs/ENV.md`
+- 技术设计（架构/模块/数据库/实现细节；附录含环境变量/开发规范/i18n/迁移规范）：`docs/TECH.md`
 - API 契约（联调基线）：`docs/API_CONTRACT.md`
-- i18n 多语言说明：`docs/I18N.md`
 
 ### 我是产品/项目管理
 
-- 产品需求：`docs/PRD.md`
-- 路线图：`docs/ROADMAP.md`
-- 任务拆解：`docs/TASKS.md`
-- 测试用例：`docs/TEST_CASES.md`
+- 产品需求（含路线图/任务拆解/测试用例）：`docs/PRD.md`
 
 ## “以谁为准”（避免重复导致的冲突）
 
 - **API 联调口径**：以 `docs/API_CONTRACT.md` 为准。
-- **环境变量**：以 `backend/app/config.py` 的 `Settings` 字段为准；文档汇总在 `docs/ENV.md`。
+- **环境变量**：以 `backend/app/config.py` 的 `Settings` 字段为准；文档汇总在 `docs/TECH.md` 的「环境变量」小节。
 - **站点检测判定**：以 `backend/app/services/site_checker.py` 为准；需求与测试用例应与其一致。
 
 ## 文档维护建议（两次 PR 策略）
 
 - PR1（小而稳）：补齐导航、修正与代码不一致/过期内容，让文档“可信”。
-- PR2（结构优化）：合并/收敛重复文档（运维、API、规划等），减少文件数量与重复段落。
-
+- PR2（结构优化）：删除已合并的旧文档文件，更新入口链接，减少文件数量与重复段落。

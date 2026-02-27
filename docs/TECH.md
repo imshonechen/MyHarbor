@@ -1078,7 +1078,7 @@ Query 参数：
 
 ## 附录
 
-> 为减少文档数量，原 `docs/ENV.md`、`docs/CODING_RULES.md`、`docs/I18N.md`、`docs/DB_MIGRATIONS.md` 的内容合并至本附录。
+> 为减少文档数量，原 `docs/ENV.md`、`docs/CODING_RULES.md`、`docs/I18N.md`、`docs/DB_MIGRATIONS.md` 的内容已合并至本附录（文件已删除）。
 
 ### 环境变量
 
