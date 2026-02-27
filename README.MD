@@ -73,11 +73,24 @@ npm run dev
 
 ## 📖 文档
 
-- [文档导航（推荐先读）](docs/README.md)
-- [产品需求文档（含路线图/任务/测试用例）](docs/PRD.md)
-- [技术设计文档（含环境变量/开发规范/i18n/迁移规范）](docs/TECH.md)
-- [API 契约文档](docs/API_CONTRACT.md)
-- [运维手册（Runbook）](docs/RUNBOOK.md)
+### 我是使用者 / 运维
+
+- 运维手册（部署、升级、备份、故障排查）：`docs/RUNBOOK.md`
+
+### 我是前后端开发
+
+- 技术设计（架构/模块/数据库/实现细节；附录含环境变量/开发规范/i18n/迁移规范）：`docs/TECH.md`
+- API 契约（联调基线）：`docs/API_CONTRACT.md`
+
+### 我是产品/项目管理
+
+- 产品需求（含路线图/任务拆解/测试用例）：`docs/PRD.md`
+
+### “以谁为准”（避免重复导致的冲突）
+
+- **API 联调口径**：以 `docs/API_CONTRACT.md` 为准。
+- **环境变量**：以 `backend/app/config.py` 的 `Settings` 字段为准；文档汇总在 `docs/TECH.md` 的「环境变量」小节。
+- **站点检测判定**：以 `backend/app/services/site_checker.py` 为准；需求与测试用例应与其一致。
 
 ## 🎯 功能概览
 
