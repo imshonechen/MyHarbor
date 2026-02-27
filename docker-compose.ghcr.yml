@@ -1,0 +1,33 @@
+version: "3.8"
+
+services:
+  myharbor:
+    image: ghcr.io/imshonechen/myharbor:${MYHARBOR_TAG:-latest}
+    container_name: myharbor
+    restart: unless-stopped
+    ports:
+      - "24041:24041"
+    volumes:
+      - ./data:/app/data
+    environment:
+      # 应用配置
+      - APP_HOST=0.0.0.0
+      - APP_PORT=24041
+      - APP_NAME=MyHarbor
+
+      # 数据库配置
+      - DATABASE_URL=sqlite:///data/myharbor.db
+
+      # JWT 密钥（生产环境请修改为强密钥）
+      - JWT_SECRET=${JWT_SECRET:-change-this-secret-in-production-min-32-chars}
+      - JWT_EXPIRE_HOURS=24
+
+      # 状态检测配置
+      - CHECK_TIMEOUT_SECONDS=5
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:24041/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
