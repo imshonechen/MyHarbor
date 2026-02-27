@@ -395,7 +395,7 @@ const { t, locale } = useI18n()
 
 ### 7.1 性能
 
-- 建议 SQLite 开启 WAL 模式提升并发读写（见 `DEPLOYMENT.md` 的排查章节）。
+- 建议 SQLite 开启 WAL 模式提升并发读写（见 `docs/RUNBOOK.md` 的故障排查章节）。
 - 站点检测当前为串行执行；如需加速可在 `check_all_sites` 引入并发与限流。
 - 列表查询支持分页（`GET /api/sites` 的 `page/size` 参数）。
 

@@ -6,9 +6,7 @@
 
 ### 我是使用者 / 运维
 
-- 生产部署：`DEPLOYMENT.md`
-- 日常运维/故障排查：`docs/RUNBOOK.md`
-- 1Panel 部署：`docs/1PANEL_DEPLOYMENT.md`
+- 部署与运维/故障排查：`docs/RUNBOOK.md`
 
 ### 我是前后端开发
 

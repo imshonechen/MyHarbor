@@ -77,7 +77,7 @@ npm run dev
 - [产品需求文档（含路线图/任务/测试用例）](docs/PRD.md)
 - [技术设计文档（含环境变量/开发规范/i18n/迁移规范）](docs/TECH.md)
 - [API 契约文档](docs/API_CONTRACT.md)
-- [生产部署指南](DEPLOYMENT.md)
+- [运维手册（Runbook）](docs/RUNBOOK.md)
 
 ## 🎯 功能概览
 
