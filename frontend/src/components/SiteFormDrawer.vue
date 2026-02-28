@@ -182,7 +182,7 @@ const handleFetchLogo = async () => {
   fetchingLogo.value = true
   try {
     const response = await fetchSiteLogo(url)
-    const logoUrl = response?.data?.logo_url
+    const logoUrl = response?.logo_url || response?.data?.logo_url
     if (logoUrl) {
       form.value.logo = logoUrl
       logoFetchMessage.value = ''
