@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from ..database import get_db
 from ..models import Site, SiteConfig, VisitLog
 from ..schemas import ApiResponse, PublicConfigData, PublicSiteItem, PublicSitesData, VisitRecordData
+from ..utils.html_sanitizer import sanitize_copyright_html
 from ..utils.visit_deduplicator import visit_deduplicator
 
 router = APIRouter(prefix="/api", tags=["public"])
@@ -32,7 +33,7 @@ def get_public_config(db: Session = Depends(get_db)) -> dict[str, object]:
     config = PublicConfigData(
         site_title=values.get("site_title", "MyHarbor"),
         site_description=values.get("site_description", ""),
-        copyright=values.get("copyright", ""),
+        copyright=sanitize_copyright_html(values.get("copyright", "")),
         icp_number=values.get("icp_number", ""),
     )
     return _ok(config.model_dump())
@@ -111,4 +112,3 @@ def record_site_visit(site_id: int, request: Request, db: Session = Depends(get_
     db.add(VisitLog(site_id=site_id, ip=ip, user_agent=user_agent))
     db.commit()
     return _ok(VisitRecordData(recorded=True).model_dump())
-

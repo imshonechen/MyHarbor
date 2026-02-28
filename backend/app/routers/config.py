@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 from ..database import get_db
 from ..dependencies.auth import get_current_admin_username
 from ..models import SiteConfig
+from ..utils.html_sanitizer import sanitize_copyright_html
 from ..utils.security import hash_password
 
 router = APIRouter(prefix="/api/config", tags=["config"])
@@ -74,7 +75,7 @@ def get_system_config(
     data = {
         "site_title": values.get("site_title", "MyHarbor"),
         "site_description": values.get("site_description", ""),
-        "copyright": values.get("copyright", ""),
+        "copyright": sanitize_copyright_html(values.get("copyright", "")),
         "icp_number": values.get("icp_number", ""),
         "admin_username": values.get("admin_username", "admin"),
         "admin_route_code": values.get("admin_route_code", ""),
@@ -115,6 +116,10 @@ def update_system_config(
             _upsert_config_value(db, "admin_route_code", code)
             new_route_code = code
             continue
+        if key == "copyright":
+            cleaned = sanitize_copyright_html(value or "")
+            _upsert_config_value(db, "copyright", cleaned)
+            continue
         _upsert_config_value(db, key, value)
 
     db.commit()
@@ -125,4 +130,3 @@ def update_system_config(
             "relogin_required": relogin_required,
         }
     )
-

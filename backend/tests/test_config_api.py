@@ -110,3 +110,32 @@ def test_update_route_code_returns_new_code() -> None:
     assert config_resp.status_code == 200
     assert config_resp.json()["data"]["admin_route_code"] == "Abc12345"
 
+
+def test_copyright_html_is_sanitized_to_prevent_xss() -> None:
+    _reset_config_data()
+    app = create_app()
+    with TestClient(app) as client:
+        token = _login(client)
+        headers = {"Authorization": f"Bearer {token}"}
+
+        raw = (
+            '<a href="javascript:alert(1)" onclick="alert(2)">X</a> '
+            '<a href="https://example.com" title="ok">MyHarbor</a>'
+            "<script>alert(3)</script>"
+        )
+        update_resp = client.put("/api/config", headers=headers, json={"copyright": raw})
+        public_resp = client.get("/api/config/public")
+        admin_resp = client.get("/api/config", headers=headers)
+
+    assert update_resp.status_code == 200
+    assert public_resp.status_code == 200
+    assert admin_resp.status_code == 200
+
+    public_html = public_resp.json()["data"]["copyright"]
+    admin_html = admin_resp.json()["data"]["copyright"]
+
+    for html in (public_html, admin_html):
+        assert "<script" not in html.lower()
+        assert "onclick" not in html.lower()
+        assert "javascript:" not in html.lower()
+        assert "example.com" in html

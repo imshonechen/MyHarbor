@@ -59,7 +59,7 @@
       </div>
 
       <footer class="small-text text-muted home-footer">
-        <div>{{ config.copyright }}</div>
+        <div v-html="config.copyright"></div>
         <div v-if="config.icp_number" style="margin-top:0.32rem;">{{ config.icp_number }}</div>
       </footer>
     </div>
