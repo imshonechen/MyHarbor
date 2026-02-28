@@ -136,6 +136,13 @@ export default {
       isPublic: '公开站点',
       isPublicHint: '公开站点将在首页显示'
     },
+    logoFetch: {
+      button: '获取Logo',
+      loading: '获取中...',
+      noUrl: '请先填写网址',
+      notFound: '未获取到logo',
+      failed: '获取失败'
+    },
     buttons: {
       cancel: '取消',
       update: '更新站点',
@@ -266,6 +273,22 @@ export default {
       noData: '暂无数据',
       homeVisits: '首页访问',
       siteClicks: '站点点击'
+    },
+    table: {
+      title: '点击统计表',
+      noData: '暂无数据',
+      home: '本站首页',
+      searchPlaceholder: '搜索站点名称 / 网址',
+      columns: {
+        siteName: '站点名称',
+        url: '网址',
+        today: '今日点击',
+        days7: '7天点击',
+        days30: '30天点击',
+        days90: '90天点击',
+        days365: '365天点击',
+        total: '总点击'
+      }
     }
   },
 

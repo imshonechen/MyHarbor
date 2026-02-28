@@ -18,3 +18,7 @@ export async function fetchStatsTrend(params = {}) {
   const suffix = query.toString() ? `?${query.toString()}` : "";
   return apiRequest(`/api/stats/trend${suffix}`, { auth: true });
 }
+
+export async function fetchStatsTable() {
+  return apiRequest("/api/stats/table", { auth: true });
+}

@@ -75,8 +75,11 @@ def test_stats_endpoints_require_authentication() -> None:
     _reset_stats_data()
     app = create_app()
     with TestClient(app) as client:
-        response = client.get("/api/stats/overview")
-    assert response.status_code == 401
+        overview_resp = client.get("/api/stats/overview")
+        table_resp = client.get("/api/stats/table")
+
+    assert overview_resp.status_code == 401
+    assert table_resp.status_code == 401
 
 
 def test_stats_overview_returns_day_month_year_total() -> None:
@@ -153,3 +156,48 @@ def test_stats_trend_returns_continuous_series() -> None:
     assert items[-1]["site_click_count"] == 4
     assert items[-2]["home_count"] == 5
     assert items[-2]["site_click_count"] == 15
+
+
+def test_click_table_returns_home_first_then_sites_with_windows() -> None:
+    _reset_stats_data()
+    _seed_visit_data()
+
+    app = create_app()
+    with TestClient(app) as client:
+        token = _login_and_get_token(client)
+        headers = {"Authorization": f"Bearer {token}"}
+        response = client.get("/api/stats/table", headers=headers)
+
+    assert response.status_code == 200
+    items = response.json()["data"]["items"]
+    assert len(items) == 3
+
+    home = items[0]
+    assert home["site_id"] is None
+    assert home["site_url"] == "/"
+    assert home["clicks_today"] == 2
+    assert home["clicks_7d"] == 7
+    assert home["clicks_30d"] == 7
+    assert home["clicks_90d"] == 14
+    assert home["clicks_365d"] == 14
+    assert home["clicks_total"] == 14
+
+    site_a = items[1]
+    assert site_a["site_name"] == "Docs"
+    assert site_a["site_url"] == "https://docs.example.com"
+    assert site_a["clicks_today"] == 3
+    assert site_a["clicks_7d"] == 14
+    assert site_a["clicks_30d"] == 14
+    assert site_a["clicks_90d"] == 24
+    assert site_a["clicks_365d"] == 24
+    assert site_a["clicks_total"] == 24
+
+    site_b = items[2]
+    assert site_b["site_name"] == "Blog"
+    assert site_b["site_url"] == "https://blog.example.com"
+    assert site_b["clicks_today"] == 1
+    assert site_b["clicks_7d"] == 5
+    assert site_b["clicks_30d"] == 5
+    assert site_b["clicks_90d"] == 5
+    assert site_b["clicks_365d"] == 5
+    assert site_b["clicks_total"] == 25

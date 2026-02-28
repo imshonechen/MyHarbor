@@ -119,6 +119,151 @@
           </div>
         </div>
       </div>
+
+      <!-- 点击统计表 -->
+      <div class="table-panel">
+        <div class="table-header">
+          <h2 class="section-title" style="margin:0;">{{ t('statistics.table.title') }}</h2>
+          <input
+            v-model.trim="tableQuery"
+            type="text"
+            class="table-search"
+            :placeholder="t('statistics.table.searchPlaceholder')"
+          />
+        </div>
+        <div class="table-sortbar">
+          <button type="button" class="sort-chip" :class="{ active: tableSortKey === null }" @click="resetTableSort">
+            {{ t('statistics.table.columns.siteName') }}
+          </button>
+          <button
+            type="button"
+            class="sort-chip"
+            :class="{ active: tableSortKey === 'clicks_today' }"
+            @click="toggleTableSort('clicks_today')"
+          >
+            {{ t('statistics.table.columns.today') }}
+            <span class="chip-indicator">{{ getTableSortIndicator('clicks_today') }}</span>
+          </button>
+          <button
+            type="button"
+            class="sort-chip"
+            :class="{ active: tableSortKey === 'clicks_7d' }"
+            @click="toggleTableSort('clicks_7d')"
+          >
+            {{ t('statistics.table.columns.days7') }}
+            <span class="chip-indicator">{{ getTableSortIndicator('clicks_7d') }}</span>
+          </button>
+          <button
+            type="button"
+            class="sort-chip"
+            :class="{ active: tableSortKey === 'clicks_30d' }"
+            @click="toggleTableSort('clicks_30d')"
+          >
+            {{ t('statistics.table.columns.days30') }}
+            <span class="chip-indicator">{{ getTableSortIndicator('clicks_30d') }}</span>
+          </button>
+          <button
+            type="button"
+            class="sort-chip"
+            :class="{ active: tableSortKey === 'clicks_90d' }"
+            @click="toggleTableSort('clicks_90d')"
+          >
+            {{ t('statistics.table.columns.days90') }}
+            <span class="chip-indicator">{{ getTableSortIndicator('clicks_90d') }}</span>
+          </button>
+          <button
+            type="button"
+            class="sort-chip"
+            :class="{ active: tableSortKey === 'clicks_365d' }"
+            @click="toggleTableSort('clicks_365d')"
+          >
+            {{ t('statistics.table.columns.days365') }}
+            <span class="chip-indicator">{{ getTableSortIndicator('clicks_365d') }}</span>
+          </button>
+          <button
+            type="button"
+            class="sort-chip"
+            :class="{ active: tableSortKey === 'clicks_total' }"
+            @click="toggleTableSort('clicks_total')"
+          >
+            {{ t('statistics.table.columns.total') }}
+            <span class="chip-indicator">{{ getTableSortIndicator('clicks_total') }}</span>
+          </button>
+        </div>
+        <div v-if="tableItems.length === 0" class="empty">{{ t('statistics.table.noData') }}</div>
+        <div v-else class="table-wrapper">
+          <table class="stats-table">
+            <thead>
+              <tr>
+                <th>
+                  <button type="button" class="sort-btn" @click="resetTableSort">
+                    {{ t('statistics.table.columns.siteName') }}
+                  </button>
+                </th>
+                <th>{{ t('statistics.table.columns.url') }}</th>
+                <th class="num">
+                  <button type="button" class="sort-btn num" @click="toggleTableSort('clicks_today')">
+                    {{ t('statistics.table.columns.today') }}
+                    <span class="sort-indicator">{{ getTableSortIndicator('clicks_today') }}</span>
+                  </button>
+                </th>
+                <th class="num">
+                  <button type="button" class="sort-btn num" @click="toggleTableSort('clicks_7d')">
+                    {{ t('statistics.table.columns.days7') }}
+                    <span class="sort-indicator">{{ getTableSortIndicator('clicks_7d') }}</span>
+                  </button>
+                </th>
+                <th class="num">
+                  <button type="button" class="sort-btn num" @click="toggleTableSort('clicks_30d')">
+                    {{ t('statistics.table.columns.days30') }}
+                    <span class="sort-indicator">{{ getTableSortIndicator('clicks_30d') }}</span>
+                  </button>
+                </th>
+                <th class="num">
+                  <button type="button" class="sort-btn num" @click="toggleTableSort('clicks_90d')">
+                    {{ t('statistics.table.columns.days90') }}
+                    <span class="sort-indicator">{{ getTableSortIndicator('clicks_90d') }}</span>
+                  </button>
+                </th>
+                <th class="num">
+                  <button type="button" class="sort-btn num" @click="toggleTableSort('clicks_365d')">
+                    {{ t('statistics.table.columns.days365') }}
+                    <span class="sort-indicator">{{ getTableSortIndicator('clicks_365d') }}</span>
+                  </button>
+                </th>
+                <th class="num">
+                  <button type="button" class="sort-btn num" @click="toggleTableSort('clicks_total')">
+                    {{ t('statistics.table.columns.total') }}
+                    <span class="sort-indicator">{{ getTableSortIndicator('clicks_total') }}</span>
+                  </button>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="row in tableDisplayRows"
+                :key="row.site_id ?? 'home'"
+                :class="{ home: row.site_id === null }"
+              >
+                <td class="name-cell" :data-label="t('statistics.table.columns.siteName')">
+                  {{ row.site_id === null ? t('statistics.table.home') : row.site_name }}
+                </td>
+                <td class="url-cell" :data-label="t('statistics.table.columns.url')">
+                  <a :href="row.site_url" target="_blank" rel="noreferrer" class="url-link">
+                    {{ row.site_url }}
+                  </a>
+                </td>
+                <td class="num" :data-label="t('statistics.table.columns.today')">{{ row.clicks_today }}</td>
+                <td class="num" :data-label="t('statistics.table.columns.days7')">{{ row.clicks_7d }}</td>
+                <td class="num" :data-label="t('statistics.table.columns.days30')">{{ row.clicks_30d }}</td>
+                <td class="num" :data-label="t('statistics.table.columns.days90')">{{ row.clicks_90d }}</td>
+                <td class="num" :data-label="t('statistics.table.columns.days365')">{{ row.clicks_365d }}</td>
+                <td class="num" :data-label="t('statistics.table.columns.total')">{{ row.clicks_total }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -126,12 +271,13 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { fetchStatsOverview, fetchSiteRanking, fetchStatsTrend } from '../../api/stats.js'
+import { fetchStatsOverview, fetchSiteRanking, fetchStatsTable, fetchStatsTrend } from '../../api/stats.js'
 
 const { t } = useI18n()
 
 const overview = ref({ home: { day: 0, month: 0, year: 0, total: 0 }, sites_total: 0 })
 const rankingItems = ref([])
+const tableItems = ref([])
 const trendItems = ref([])
 const loading = ref(false)
 const error = ref('')
@@ -139,6 +285,10 @@ const error = ref('')
 const rankingRange = ref('day')
 const rankingLimit = ref(20)
 const trendDays = ref(30)
+
+const tableQuery = ref('')
+const tableSortKey = ref(null)
+const tableSortDir = ref('desc')
 
 const maxRankingCount = computed(() => {
   return Math.max(...rankingItems.value.map(item => item.click_count), 1)
@@ -155,15 +305,17 @@ const loadStats = async () => {
   loading.value = true
   error.value = ''
   try {
-    const [overviewData, rankingData, trendData] = await Promise.all([
+    const [overviewData, rankingData, trendData, tableData] = await Promise.all([
       fetchStatsOverview(),
       fetchSiteRanking({ range: rankingRange.value, limit: rankingLimit.value }),
-      fetchStatsTrend({ days: trendDays.value })
+      fetchStatsTrend({ days: trendDays.value }),
+      fetchStatsTable()
     ])
 
     overview.value = overviewData
     rankingItems.value = rankingData.items || []
     trendItems.value = trendData.items || []
+    tableItems.value = tableData.items || []
   } catch (err) {
     console.error('Failed to load statistics:', err)
     error.value = err.message || 'Failed to load statistics. Please check console for details.'
@@ -171,6 +323,61 @@ const loadStats = async () => {
     loading.value = false
   }
 }
+
+const resetTableSort = () => {
+  tableSortKey.value = null
+  tableSortDir.value = 'desc'
+}
+
+const toggleTableSort = (key) => {
+  if (tableSortKey.value === key) {
+    tableSortDir.value = tableSortDir.value === 'desc' ? 'asc' : 'desc'
+    return
+  }
+  tableSortKey.value = key
+  tableSortDir.value = 'desc'
+}
+
+const getTableSortIndicator = (key) => {
+  if (tableSortKey.value !== key) return ''
+  return tableSortDir.value === 'desc' ? '▼' : '▲'
+}
+
+const tableDisplayRows = computed(() => {
+  const raw = Array.isArray(tableItems.value) ? tableItems.value : []
+  const homeRow = raw.find(row => row.site_id === null) || null
+  const siteRows = raw.filter(row => row.site_id !== null)
+
+  const query = String(tableQuery.value || '').trim().toLowerCase()
+  let filteredRows = siteRows
+  if (query) {
+    filteredRows = siteRows.filter((row) => {
+      const name = String(row.site_name || '').toLowerCase()
+      const url = String(row.site_url || '').toLowerCase()
+      return name.includes(query) || url.includes(query)
+    })
+  }
+
+  let sortedRows = filteredRows
+  if (tableSortKey.value) {
+    const key = tableSortKey.value
+    const dir = tableSortDir.value
+    const indexById = new Map(siteRows.map((row, idx) => [row.site_id, idx]))
+    sortedRows = [...filteredRows].sort((a, b) => {
+      const av = Number(a[key] || 0)
+      const bv = Number(b[key] || 0)
+      if (av === bv) {
+        return (indexById.get(a.site_id) ?? 0) - (indexById.get(b.site_id) ?? 0)
+      }
+      return dir === 'desc' ? bv - av : av - bv
+    })
+  }
+
+  const rows = []
+  if (homeRow) rows.push(homeRow)
+  rows.push(...sortedRows)
+  return rows
+})
 
 const getRankBarWidth = (count) => {
   return (count / maxRankingCount.value) * 100
@@ -316,7 +523,8 @@ onMounted(() => {
 }
 
 .ranking-panel,
-.trend-panel {
+.trend-panel,
+.table-panel {
   background: rgba(20, 121, 191, 0.3);
   backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.15);
@@ -469,6 +677,154 @@ onMounted(() => {
   background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
 }
 
+.table-panel {
+  margin-top: 2rem;
+}
+
+.table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.table-search {
+  width: min(360px, 100%);
+  padding: 0.55rem 0.75rem;
+  background: rgba(20, 121, 191, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 0.75rem;
+  color: white;
+  font-size: 0.9rem;
+}
+
+.table-search::placeholder {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.table-sortbar {
+  display: none;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.sort-chip {
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.78);
+  border-radius: 999px;
+  padding: 0.45rem 0.7rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.sort-chip.active {
+  background: rgba(96, 165, 250, 0.25);
+  border-color: rgba(96, 165, 250, 0.45);
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.chip-indicator {
+  opacity: 0.8;
+  min-width: 1rem;
+  text-align: center;
+}
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.stats-table {
+  width: 100%;
+  min-width: 980px;
+  border-collapse: collapse;
+}
+
+.stats-table th,
+.stats-table td {
+  padding: 0.75rem 0.875rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  vertical-align: middle;
+}
+
+.stats-table th {
+  text-align: left;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+  white-space: nowrap;
+}
+
+.stats-table td {
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.9rem;
+}
+
+.stats-table td.num,
+.stats-table th.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.sort-btn {
+  background: transparent;
+  border: none;
+  color: inherit;
+  font: inherit;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.sort-btn.num {
+  width: 100%;
+  justify-content: flex-end;
+}
+
+.sort-indicator {
+  opacity: 0.75;
+  font-size: 0.75rem;
+  min-width: 1rem;
+  text-align: center;
+}
+
+.sort-btn:hover .sort-indicator {
+  opacity: 1;
+}
+
+.stats-table tr.home td {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.name-cell {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  white-space: nowrap;
+}
+
+.url-cell {
+  min-width: 220px;
+}
+
+.url-link {
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  border-bottom: 1px dotted rgba(255, 255, 255, 0.35);
+}
+
+.url-link:hover {
+  color: rgba(255, 255, 255, 0.9);
+  border-bottom-color: rgba(255, 255, 255, 0.65);
+}
+
 .loading,
 .empty {
   text-align: center;
@@ -577,9 +933,97 @@ onMounted(() => {
   }
 
   .ranking-panel,
-  .trend-panel {
+  .trend-panel,
+  .table-panel {
     padding: 1rem;
     overflow-x: hidden;
+  }
+
+  .table-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .table-sortbar {
+    display: flex;
+  }
+
+  /* 移动端使用卡片布局替代表格 */
+  .table-wrapper {
+    overflow-x: visible;
+  }
+
+  .stats-table {
+    display: block;
+    min-width: 0;
+  }
+
+  .stats-table thead {
+    display: none;
+  }
+
+  .stats-table tbody {
+    display: block;
+  }
+
+  .stats-table tr {
+    display: block;
+    background: rgba(20, 121, 191, 0.3);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 1rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .stats-table tr.home {
+    border-color: rgba(96, 165, 250, 0.45);
+  }
+
+  .stats-table td {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.45rem 0;
+    border: none;
+    text-align: left;
+  }
+
+  .stats-table td::before {
+    content: attr(data-label);
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 0.8rem;
+    flex: 0 0 auto;
+  }
+
+  .stats-table td.name-cell {
+    display: block;
+    padding: 0;
+    margin-bottom: 0.5rem;
+    font-size: 1.05rem;
+  }
+
+  .stats-table td.name-cell::before {
+    content: none;
+  }
+
+  .stats-table td.url-cell {
+    display: block;
+    padding: 0;
+    margin-bottom: 0.75rem;
+  }
+
+  .stats-table td.url-cell::before {
+    content: none;
+  }
+
+  .stats-table td.url-cell a {
+    word-break: break-all;
+  }
+
+  .stats-table td.num {
+    font-variant-numeric: tabular-nums;
   }
 
   .ranking-item {

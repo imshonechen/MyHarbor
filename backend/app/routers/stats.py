@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from ..database import get_db
 from ..dependencies.auth import get_current_admin_username
 from ..schemas import ApiResponse
-from ..services.stats_service import get_site_ranking, get_stats_overview, get_stats_trend
+from ..services.stats_service import get_click_table, get_site_ranking, get_stats_overview, get_stats_trend
 
 router = APIRouter(prefix="/api/stats", tags=["stats"])
 
@@ -42,3 +42,11 @@ def get_trend(
     _admin: str = Depends(get_current_admin_username),
 ) -> dict[str, object]:
     return _ok({"items": get_stats_trend(db, days=days)})
+
+
+@router.get("/table", response_model=ApiResponse)
+def get_click_table_stats(
+    db: Session = Depends(get_db),
+    _admin: str = Depends(get_current_admin_username),
+) -> dict[str, object]:
+    return _ok({"items": get_click_table(db)})
