@@ -2,6 +2,11 @@ from __future__ import annotations
 
 import bleach
 
+try:
+    from bleach.css_sanitizer import CSSSanitizer
+except ImportError:  # pragma: no cover
+    CSSSanitizer = None
+
 _ALLOWED_TAGS = [
     "a",
     "b",
@@ -16,7 +21,7 @@ _ALLOWED_TAGS = [
 
 _ALLOWED_ATTRIBUTES = {
     "a": ["href", "title"],
-    "img": ["src", "alt", "title", "width", "height"],
+    "img": ["src", "alt", "title", "width", "height", "display", "style"],
 }
 
 _ALLOWED_PROTOCOLS = [
@@ -24,6 +29,8 @@ _ALLOWED_PROTOCOLS = [
     "https",
     "mailto",
 ]
+
+_CSS_SANITIZER = CSSSanitizer(allowed_css_properties=["display"]) if CSSSanitizer else None
 
 
 def sanitize_footer_html(value: str) -> str:
@@ -33,6 +40,7 @@ def sanitize_footer_html(value: str) -> str:
         attributes=_ALLOWED_ATTRIBUTES,
         protocols=_ALLOWED_PROTOCOLS,
         strip=True,
+        css_sanitizer=_CSS_SANITIZER,
     )
 
 

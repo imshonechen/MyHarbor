@@ -179,8 +179,9 @@ def test_footer_html_allows_safe_img_src_and_strips_unsafe_attributes() -> None:
         headers = {"Authorization": f"Bearer {token}"}
 
         raw = (
-            '<img src="https://example.com/logo.png" alt="logo" onerror="alert(1)">'
-            '<img src="javascript:alert(2)">'
+            '<img src="https://example.com/logo.png" alt="logo" display="block" '
+            'style="display:block; background-image:url(javascript:alert(1))" onerror="alert(2)">'
+            '<img src="javascript:alert(3)" style="display:block">'
         )
         update_resp = client.put(
             "/api/config",
@@ -201,5 +202,9 @@ def test_footer_html_allows_safe_img_src_and_strips_unsafe_attributes() -> None:
         for html in (public_html, admin_html):
             assert "<img" in html.lower()
             assert "https://example.com/logo.png" in html
+            assert 'display="block"' in html.lower()
+            assert "style=" in html.lower()
+            assert "display" in html.lower()
             assert "onerror" not in html.lower()
+            assert "background-image" not in html.lower()
             assert "javascript:" not in html.lower()
