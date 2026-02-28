@@ -67,24 +67,24 @@
 
           <div class="form-group">
             <label for="copyright">{{ t('settings.siteConfig.copyright') }}</label>
-            <input
+            <textarea
               id="copyright"
               v-model="siteForm.copyright"
-              type="text"
-              class="form-input"
+              class="form-textarea"
+              rows="2"
               placeholder="© 2026 MyHarbor"
-            />
+            ></textarea>
           </div>
 
           <div class="form-group">
             <label for="icp_number">{{ t('settings.siteConfig.icpNumber') }}</label>
-            <input
+            <textarea
               id="icp_number"
               v-model="siteForm.icp_number"
-              type="text"
-              class="form-input"
+              class="form-textarea"
+              rows="2"
               :placeholder="t('settings.siteConfig.icpPlaceholder')"
-            />
+            ></textarea>
           </div>
 
           <div v-if="siteError" class="error-message">{{ siteError }}</div>

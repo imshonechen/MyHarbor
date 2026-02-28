@@ -139,3 +139,33 @@ def test_copyright_html_is_sanitized_to_prevent_xss() -> None:
         assert "onclick" not in html.lower()
         assert "javascript:" not in html.lower()
         assert "example.com" in html
+
+
+def test_icp_number_html_is_sanitized_to_prevent_xss() -> None:
+    _reset_config_data()
+    app = create_app()
+    with TestClient(app) as client:
+        token = _login(client)
+        headers = {"Authorization": f"Bearer {token}"}
+
+        raw = (
+            '<a href="javascript:alert(1)" onclick="alert(2)">ICP</a> '
+            '<a href="https://beian.miit.gov.cn/" title="ok">备案信息</a>'
+            "<script>alert(3)</script>"
+        )
+        update_resp = client.put("/api/config", headers=headers, json={"icp_number": raw})
+        public_resp = client.get("/api/config/public")
+        admin_resp = client.get("/api/config", headers=headers)
+
+    assert update_resp.status_code == 200
+    assert public_resp.status_code == 200
+    assert admin_resp.status_code == 200
+
+    public_html = public_resp.json()["data"]["icp_number"]
+    admin_html = admin_resp.json()["data"]["icp_number"]
+
+    for html in (public_html, admin_html):
+        assert "<script" not in html.lower()
+        assert "onclick" not in html.lower()
+        assert "javascript:" not in html.lower()
+        assert "beian.miit.gov.cn" in html

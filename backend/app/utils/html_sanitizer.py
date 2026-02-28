@@ -24,7 +24,7 @@ _ALLOWED_PROTOCOLS = [
 ]
 
 
-def sanitize_copyright_html(value: str) -> str:
+def sanitize_footer_html(value: str) -> str:
     return bleach.clean(
         value,
         tags=_ALLOWED_TAGS,
@@ -33,3 +33,10 @@ def sanitize_copyright_html(value: str) -> str:
         strip=True,
     )
 
+
+def sanitize_copyright_html(value: str) -> str:
+    return sanitize_footer_html(value)
+
+
+def sanitize_icp_number_html(value: str) -> str:
+    return sanitize_footer_html(value)

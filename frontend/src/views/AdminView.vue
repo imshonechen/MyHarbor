@@ -170,9 +170,9 @@
           <h2 style="margin:0; font-size:1.16rem;">System Settings</h2>
           <form class="form-grid-two" @submit.prevent="onSaveSettings">
             <input v-model.trim="settingsForm.site_title" type="text" placeholder="Site title" class="pill-input" />
-            <input v-model.trim="settingsForm.icp_number" type="text" placeholder="ICP number" class="pill-input" />
+            <textarea v-model.trim="settingsForm.icp_number" rows="2" placeholder="ICP number" class="pill-textarea"></textarea>
             <textarea v-model.trim="settingsForm.site_description" rows="2" placeholder="Site description" class="pill-textarea full-span"></textarea>
-            <input v-model.trim="settingsForm.copyright" type="text" placeholder="Copyright" class="pill-input full-span" />
+            <textarea v-model.trim="settingsForm.copyright" rows="2" placeholder="Copyright" class="pill-textarea full-span"></textarea>
             <input v-model.trim="settingsForm.admin_username" type="text" placeholder="Admin username" class="pill-input" />
             <input v-model.trim="settingsForm.admin_password" type="password" placeholder="New admin password" class="pill-input" />
             <input v-model.trim="settingsForm.admin_route_code" type="text" placeholder="Admin route code" class="pill-input" />

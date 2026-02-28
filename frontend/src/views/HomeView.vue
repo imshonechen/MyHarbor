@@ -60,7 +60,7 @@
 
       <footer class="small-text text-muted home-footer">
         <div v-html="config.copyright"></div>
-        <div v-if="config.icp_number" style="margin-top:0.32rem;">{{ config.icp_number }}</div>
+        <div v-if="config.icp_number" style="margin-top:0.32rem;" v-html="config.icp_number"></div>
       </footer>
     </div>
   </main>
