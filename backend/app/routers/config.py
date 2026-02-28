@@ -48,8 +48,8 @@ def _upsert_config_value(db: Session, key: str, value: str) -> None:
 class ConfigUpdateRequest(BaseModel):
     site_title: str | None = Field(default=None, min_length=1, max_length=120)
     site_description: str | None = Field(default=None, max_length=1000)
-    copyright: str | None = Field(default=None, max_length=300)
-    icp_number: str | None = Field(default=None, max_length=120)
+    copyright: str | None = Field(default=None, max_length=2000)
+    icp_number: str | None = Field(default=None, max_length=2000)
     admin_username: str | None = Field(default=None, min_length=1, max_length=64)
     admin_password: str | None = Field(default=None, min_length=1, max_length=128)
     admin_route_code: str | None = Field(default=None, min_length=6, max_length=32)
