@@ -208,7 +208,7 @@ MyHarbor/
    - `check_interval`
 3. 启动日志打印后台入口（包含 route code）。
 
-> `copyright` / `icp_number` 支持有限 HTML（如 `&copy;`、`<a href="...">`、`<br>` 等），后端会对其进行清洗以降低 XSS 注入风险。
+> `copyright` / `icp_number` 支持有限 HTML（如 `&copy;`、`<a href="...">`、`<br>`、`<img src="...">` 等），后端会对其进行清洗以降低 XSS 注入风险。
 
 ## 5. 后端设计
 

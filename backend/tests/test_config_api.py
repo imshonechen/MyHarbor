@@ -169,3 +169,37 @@ def test_icp_number_html_is_sanitized_to_prevent_xss() -> None:
         assert "onclick" not in html.lower()
         assert "javascript:" not in html.lower()
         assert "beian.miit.gov.cn" in html
+
+
+def test_footer_html_allows_safe_img_src_and_strips_unsafe_attributes() -> None:
+    _reset_config_data()
+    app = create_app()
+    with TestClient(app) as client:
+        token = _login(client)
+        headers = {"Authorization": f"Bearer {token}"}
+
+        raw = (
+            '<img src="https://example.com/logo.png" alt="logo" onerror="alert(1)">'
+            '<img src="javascript:alert(2)">'
+        )
+        update_resp = client.put(
+            "/api/config",
+            headers=headers,
+            json={"copyright": raw, "icp_number": raw},
+        )
+        public_resp = client.get("/api/config/public")
+        admin_resp = client.get("/api/config", headers=headers)
+
+    assert update_resp.status_code == 200
+    assert public_resp.status_code == 200
+    assert admin_resp.status_code == 200
+
+    for key in ("copyright", "icp_number"):
+        public_html = public_resp.json()["data"][key]
+        admin_html = admin_resp.json()["data"][key]
+
+        for html in (public_html, admin_html):
+            assert "<img" in html.lower()
+            assert "https://example.com/logo.png" in html
+            assert "onerror" not in html.lower()
+            assert "javascript:" not in html.lower()

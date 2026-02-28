@@ -7,6 +7,7 @@ _ALLOWED_TAGS = [
     "b",
     "br",
     "em",
+    "img",
     "i",
     "small",
     "span",
@@ -15,6 +16,7 @@ _ALLOWED_TAGS = [
 
 _ALLOWED_ATTRIBUTES = {
     "a": ["href", "title"],
+    "img": ["src", "alt", "title", "width", "height"],
 }
 
 _ALLOWED_PROTOCOLS = [
