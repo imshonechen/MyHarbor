@@ -91,6 +91,7 @@
 | POST | `/sites/{site_id}/check` | 检测单站点 |
 | POST | `/sites/check-all` | 检测全部站点 |
 | GET | `/sites/{site_id}/status-logs` | 获取状态日志 |
+| GET | `/sites/logo` | 根据站点网址自动获取 Logo |
 | GET | `/stats/overview` | 统计概览 |
 | GET | `/stats/sites` | 站点排行 |
 | GET | `/stats/trend` | 趋势数据 |
@@ -284,6 +285,50 @@
     "updated": 6,
     "skipped": 2
   }
+}
+```
+
+### 5.9 GET `/sites/logo`
+
+说明：根据站点网址自动解析站点图标（favicon / apple-touch-icon / manifest icons），用于快速填充站点的 `logo` 字段。
+
+认证：需要 `Authorization: Bearer <token>` 头。
+
+Query 参数：
+
+- `url`：站点网址，必须以 `http://` 或 `https://` 开头。
+
+成功响应（找到图标）：
+
+```json
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "logo_url": "https://douyin.com/favicon.ico"
+  }
+}
+```
+
+成功响应（未找到/不符合要求）：
+
+```json
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "logo_url": null
+  }
+}
+```
+
+错误响应：
+
+- `400`：`url` 非法（不是 http/https）
+
+```json
+{
+  "detail": "url must start with http:// or https://"
 }
 ```
 
