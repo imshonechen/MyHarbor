@@ -33,13 +33,24 @@
 
         <div class="form-group">
           <label for="logo">{{ t('siteForm.fields.logo') }}</label>
-          <input
-            id="logo"
-            v-model="form.logo"
-            type="text"
-            class="form-input"
-            :placeholder="t('siteForm.fields.logoPlaceholder')"
-          />
+          <div class="logo-row">
+            <input
+              id="logo"
+              v-model="form.logo"
+              type="text"
+              class="form-input"
+              :placeholder="t('siteForm.fields.logoPlaceholder')"
+            />
+            <button
+              type="button"
+              class="logo-fetch-btn"
+              @click="handleFetchLogo"
+              :disabled="fetchingLogo"
+            >
+              {{ fetchingLogo ? t('siteForm.logoFetch.loading') : t('siteForm.logoFetch.button') }}
+            </button>
+            <span v-if="logoFetchMessage" class="logo-fetch-message">{{ logoFetchMessage }}</span>
+          </div>
         </div>
 
         <div class="form-group">
@@ -107,7 +118,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { createSite, updateSite } from '../api/sites.js'
+import { createSite, updateSite, fetchSiteLogo } from '../api/sites.js'
 
 const { t } = useI18n()
 
@@ -134,6 +145,8 @@ const form = ref({
 
 const saving = ref(false)
 const error = ref('')
+const fetchingLogo = ref(false)
+const logoFetchMessage = ref('')
 
 onMounted(() => {
   if (props.site) {
@@ -151,6 +164,37 @@ onMounted(() => {
 
 const handleOverlayClick = () => {
   emit('close')
+}
+
+const handleFetchLogo = async () => {
+  logoFetchMessage.value = ''
+
+  let url = form.value.url.trim()
+  if (!url) {
+    logoFetchMessage.value = t('siteForm.logoFetch.noUrl')
+    return
+  }
+
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    url = 'https://' + url
+  }
+
+  fetchingLogo.value = true
+  try {
+    const response = await fetchSiteLogo(url)
+    const logoUrl = response?.data?.logo_url
+    if (logoUrl) {
+      form.value.logo = logoUrl
+      logoFetchMessage.value = ''
+    } else {
+      logoFetchMessage.value = t('siteForm.logoFetch.notFound')
+    }
+  } catch (err) {
+    console.error('Failed to fetch logo:', err)
+    logoFetchMessage.value = t('siteForm.logoFetch.failed')
+  } finally {
+    fetchingLogo.value = false
+  }
 }
 
 const handleSubmit = async () => {
@@ -322,6 +366,46 @@ const handleSubmit = async () => {
 .form-hint {
   font-size: 0.8rem;
   color: rgba(255, 255, 255, 0.5);
+}
+
+.logo-row {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.logo-row .form-input {
+  flex: 1 1 240px;
+  min-width: 0;
+}
+
+.logo-fetch-btn {
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.logo-fetch-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.logo-fetch-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.logo-fetch-message {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.75);
+  white-space: nowrap;
 }
 
 .checkbox-group {

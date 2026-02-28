@@ -136,6 +136,13 @@ export default {
       isPublic: 'Public Site',
       isPublicHint: 'Public sites are visible on the homepage'
     },
+    logoFetch: {
+      button: 'Fetch Logo',
+      loading: 'Fetching...',
+      noUrl: 'Please enter URL first',
+      notFound: 'No logo found',
+      failed: 'Fetch failed'
+    },
     buttons: {
       cancel: 'Cancel',
       update: 'Update Site',

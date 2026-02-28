@@ -13,6 +13,7 @@ from ..database import get_db
 from ..dependencies.auth import get_current_admin_username
 from ..models import Site, SiteStatusLog
 from ..services.site_checker import SiteCheckResult, check_all_sites, check_single_site
+from ..services.site_logo_service import fetch_site_logo_url
 
 router = APIRouter(prefix="/api/sites", tags=["sites"])
 
@@ -232,6 +233,20 @@ def update_site_sort_orders(
 
     db.commit()
     return _ok({"updated": len(payload.items)})
+
+
+@router.get("/logo")
+def fetch_logo_url(
+    url: str = Query(min_length=1, max_length=2048),
+    _admin: str = Depends(get_current_admin_username),
+) -> dict[str, object]:
+    normalized = url.strip()
+    if not _is_valid_http_url(normalized):
+        raise HTTPException(status_code=400, detail="url must start with http:// or https://")
+
+    settings = get_settings()
+    logo_url = fetch_site_logo_url(normalized, timeout_seconds=settings.check_timeout_seconds)
+    return _ok({"logo_url": logo_url})
 
 
 @router.post("/check-all")

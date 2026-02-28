@@ -70,3 +70,9 @@ export async function fetchSiteStatusLogs(siteId, params = {}) {
   const suffix = query.toString() ? `?${query.toString()}` : "";
   return apiRequest(`/api/sites/${siteId}/status-logs${suffix}`, { auth: true });
 }
+
+export async function fetchSiteLogo(url) {
+  const query = new URLSearchParams();
+  query.set("url", String(url || ""));
+  return apiRequest(`/api/sites/logo?${query.toString()}`, { auth: true });
+}
